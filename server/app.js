@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import authRouter from "./apps/auth.js";
+import blogsRouter from "./apps/blogs.js";
 import dotenv from "dotenv";
 
 async function init() {
@@ -12,13 +13,10 @@ async function init() {
   app.use(cors());
   app.use(bodyParser.json());
   app.use("/", authRouter);
-
-  app.get("/", (req, res) => {
-    res.send("Hello World!");
-  });
+  app.use("/blogs", blogsRouter);
 
   app.get("*", (req, res) => {
-    res.status(404).send("Not found");
+    res.status(404).send({ message: "Not found!" });
   });
 
   app.listen(port, () => {
