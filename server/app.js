@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import authRouter from "./apps/auth.js";
 import blogsRouter from "./apps/blogs.js";
+import commentRouter from "./apps/comments.js";
 import dotenv from "dotenv";
 
 async function init() {
@@ -12,8 +13,13 @@ async function init() {
 
   app.use(cors());
   app.use(bodyParser.json());
-  app.use("/", authRouter);
+  app.use("/auth", authRouter);
   app.use("/blogs", blogsRouter);
+  app.use("/blogs", commentRouter);
+
+  app.get("/", (req, res) => {
+    res.status(404).send({ message: "Welcome !" });
+  });
 
   app.get("*", (req, res) => {
     res.status(404).send({ message: "Not found!" });

@@ -12,9 +12,14 @@ authRouter.post("/register", async (req, res) => {
   const lastname = req.body.lastName;
   const created_at = new Date().toISOString();
   const updated_at = new Date().toISOString();
-  // error condition **************************
-  if (!username || !password || !firstname || !lastname) {
-    return res.status(400).json({ message: "please fill in the blank" });
+
+  // valify username condition ************************
+  const unique = await pool.query(
+    "select username from users where username = $1",
+    [username]
+  );
+  if (unique.rows.length) {
+    return res.json({ message: "Username is used already!" });
   }
 
   const user = {
@@ -33,7 +38,7 @@ authRouter.post("/register", async (req, res) => {
       "insert into users(username, password, first_name, last_name,created_at,updated_at) values($1,$2,$3,$4,$5,$6)";
     const value = Object.values(user);
     //   send request to data base *******************
-    await pool.query(query, value);
+    const result = await pool.query(query, value);
   } catch (err) {
     res.json({ message: "Server is error !" });
   }
@@ -72,6 +77,7 @@ authRouter.post("/login", async (req, res) => {
       username: result.username,
       firstName: result.first_name,
       lastName: result.lastName,
+      user_id: result.user_id,
     },
     process.env.SECRET_KEY,
     {
